@@ -48,7 +48,7 @@ Ends the performance instance with the given name; and calculates the elapsed hi
     • *endTime* `Number` — UTC end time of the execution (low-resolution).  
 
 ### `.result(name)`
-Gets the calculated result of the performance instance for the given name. To be used with non-destroyed, ended instances. If instance is not yet ended, returns `null`. If instance does not exist (i.e. already destroyed), throws an error.  
+Gets the calculated result of the performance instance for the given name. To be used with non-destroyed, ended instances. If instance is not yet ended or does not exist at all, returns `null`.  
 **Parameters:**  
     • *name* `String` — Required. Unique name of the performance instance.  
 **returns** `Object` — A result object (see `.end()` method).  

@@ -91,6 +91,8 @@ module.exports = (function () {
         name = String(name);
         var p = perfList[name];
         if (!p) { throw new Error(ERR_NOITEM + name); }
+        // if already ended and has result, return
+        if (p.result) { return p.result; }
         var result = p.end();
         if (p.autoDestroy) {
             delete perfList[name];
@@ -103,7 +105,7 @@ module.exports = (function () {
         name = String(name);
         var p = perfList[name];
         if (!p) {
-            throw new Error(ERR_NOITEM + name);
+            return null;
         }
         return p.result;
     };
