@@ -28,53 +28,71 @@ Simple. You don't need to manually create a new instance for each operation. Jus
 
 ### `.start(name [, autoDestroy])`
 Initializes a new performance instance with the given name; and marks the current high-resolution real time.  
+
 **Parameters:**  
-    • *name* `String` — Required. Unique name of the performance instance to be started. Setting an existing name will overwrite this item. Use `.exists()` method to check for existence.  
-    • *autoDestroy* `Boolean` — Optional. Default: `true`. Specifies whether this performance instance should be destroyed when `.end()` is called.  
+
+ - *name* `String` — Required. Unique name of the performance instance to be started. Setting an existing name will overwrite this item. Use `.exists()` method to check for existence.  
+ - *autoDestroy* `Boolean` — Optional. Default: `true`. Specifies whether this performance instance should be destroyed when `.end()` is called.  
 **returns** `perfy`  
 
 ### `.end(name)`
 Ends the performance instance with the given name; and calculates the elapsed high-resolution real time. Note that if `autoDestroy` is not disabled when `.start()` is called; corresponding performance instance is immediately destroyed after returning the result.  
+
 **Parameters:**  
-    • *name* `String` — Required. Unique name of the performance instance to be ended.  
+
+ - *name* `String` — Required. Unique name of the performance instance to be ended.  
+
 **returns** `Object` — A result object with the following properties.  
-    • *name* `String` — Initialized name of the performance instance.   
-    • *seconds* `Number` — Seconds portion of the elapsed time.   
-    • *nanoseconds* `Number` — Nanoseconds portion of the elapsed time.    
-    • *milliseconds* `Number` — Nanoseconds converted to milliseconds.  
-    • *time* `Number` — Float representation of elapsed time. e.g. `1.347` (seconds).   
-    • *summary* `String` — Text summary shorthand for elapsed time.  
-    • *startTime* `Number` — UTC start time of the execution (low-resolution).  
-    • *endTime* `Number` — UTC end time of the execution (low-resolution).  
+
+ - *name* `String` — Initialized name of the performance instance.   
+ - *seconds* `Number` — Seconds portion of the elapsed time.   
+ - *nanoseconds* `Number` — Nanoseconds portion of the elapsed time.    
+ - *milliseconds* `Number` — Nanoseconds converted to milliseconds.  
+ - *time* `Number` — Float representation of elapsed time. e.g. `1.347` (seconds).   
+ - *summary* `String` — Text summary shorthand for elapsed time.  
+ - *startTime* `Number` — UTC start time of the execution (low-resolution).  
+ - *endTime* `Number` — UTC end time of the execution (low-resolution).  
 
 ### `.result(name)`
 Gets the calculated result of the performance instance for the given name. To be used with non-destroyed, ended instances. If instance is not yet ended or does not exist at all, returns `null`.  
+
 **Parameters:**  
-    • *name* `String` — Required. Unique name of the performance instance.  
+
+ - *name* `String` — Required. Unique name of the performance instance.  
+
 **returns** `Object` — A result object (see `.end()` method).  
 
 ### `.exists(name)`
 Specifies whether a performance instance exists with the given name. This method will return `false` for an item, if called after `.end(name)` is called since the instance is destroyed.  
+
 **Parameters:**  
-    • *name* `String` — Required. Name of the performance instance to be checked.  
+
+ - *name* `String` — Required. Name of the performance instance to be checked.  
+
 **returns** `Boolean`
 
 ### `.destroy(name)`
 Destroys the performance instance with the given name.  
+
 **Parameters:**  
-    • *name* `String` — Required. Name of the performance instance to be destroyed.  
+
+ - *name* `String` — Required. Name of the performance instance to be destroyed.  
+
 **returns** `perfy`
 
 ### `.destroyAll()`
 Destroys all existing performance instances.  
+
 **returns** `perfy`
 
 ### `.names()`
 Gets the names of existing performance instances.  
+
 **returns** `Array`  
 
 ### `.count()`
 Gets the total number of existing performance instances.  
+
 **returns** `Number`  
 
 ## Examples:  
@@ -113,6 +131,11 @@ Destroy all:
 
 - **v1.0.0** (2015-10-12)  
     + First release.
+    
+    ---
+
+- **v1.0.1** (2015-10-12)  
+    + `.result(name)` will not throw (and return `null`) even if the perf-instance does not exist.  
     
     ---
 
