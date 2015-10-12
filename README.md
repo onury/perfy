@@ -33,6 +33,7 @@ Initializes a new performance instance with the given name; and marks the curren
 
  - *name* `String` — Required. Unique name of the performance instance to be started. Setting an existing name will overwrite this item. Use `.exists()` method to check for existence.  
  - *autoDestroy* `Boolean` — Optional. Default: `true`. Specifies whether this performance instance should be destroyed when `.end()` is called.  
+
 **returns** `perfy`  
 
 ### `.end(name)`
