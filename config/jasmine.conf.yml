@@ -1,0 +1,37 @@
+# Config for grunt-jasmine-nodejs
+# https://github.com/onury/grunt-jasmine-nodejs
+{
+    # task specific (default) options
+    options: {
+        specNameSuffix: "spec.js", # also accepts an array
+        helperNameSuffix: "helper.js",
+        useHelpers: false,
+        stopOnFailure: false,
+        # options for built-in reporters
+        reporters: {
+            # console (default) reporter
+            console: {
+                colors: true,
+                cleanStack: 1,       # (0|false)|(1|true)|2|3
+                verbosity: 3,        # (0|false)|1|2|(3|true)|4
+                listStyle: "indent", # "flat"|"indent"
+                activity: true
+            }
+        },
+        # list of custom Jasmine reporter objects
+        customReporters: []
+    },
+    test: {
+        # target specific options
+        options: {
+            useHelpers: true
+        },
+        # spec files
+        specs: [
+            "test/*"
+        ],
+        helpers: [
+
+        ]
+    }
+}
