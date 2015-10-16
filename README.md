@@ -26,10 +26,10 @@ Simple. Just call `perfy.start('unique-name')` and the performance instance will
 ```
 ... or you could:
 ```js
-    perfy.exec('loop-stuff', function (done) {
+    perfy.exec('async-stuff', function (done) {
         // some heavy stuff here...
         var result = done();
-        console.log(result.summary); // —> loop-stuff: 1.459 sec.
+        console.log(result.summary); // —> async-stuff: 1.459 sec.
     });    
 ```
 
