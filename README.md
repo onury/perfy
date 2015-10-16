@@ -2,7 +2,7 @@
 
 A simple, light-weight NodeJS utility for measuring code execution in high-resolution real times.
 
-> Version: 1.0.0  
+> Version: 1.1.0  
 > Author: Onur Yıldırım (onury) © 2015  
 > Licensed under the MIT License.  
 
@@ -14,14 +14,23 @@ A simple, light-weight NodeJS utility for measuring code execution in high-resol
 
 ## Usage
 
-Simple. You don't need to manually create a new instance for each operation. Just call `perfy.start('unique-name')` and the performance instance will be created and start time will be set until you call `perfy.end('unique-name')` which returns a result object containing the high-res elapsed time information (and destroys the created instance).
+Simple. Just call `perfy.start('unique-name')` and the performance instance will be created and start time will be set until you call `perfy.end('unique-name')` which returns a result object containing the high-res elapsed time information (and destroys the created instance).
 
 ```js
     var perfy = require('perfy');
+
     perfy.start('loop-stuff');
     // some heavy stuff here...
-    console.log(perfy.end('loop-stuff').summary);
-    // —> loop-stuff: 1.459 sec.
+    var result = perfy.end('loop-stuff');
+    console.log(result.summary); // —> loop-stuff: 1.459 sec.
+```
+... or you could:
+```js
+    perfy.exec('loop-stuff', function (done) {
+        // some heavy stuff here...
+        var result = done();
+        console.log(result.summary); // —> loop-stuff: 1.459 sec.
+    });    
 ```
 
 ## Documentation
@@ -53,6 +62,38 @@ Ends the performance instance with the given name; and calculates the elapsed hi
  - *summary* `String` — Text summary shorthand for elapsed time.  
  - *startTime* `Number` — UTC start time of the execution (low-resolution).  
  - *endTime* `Number` — UTC end time of the execution (low-resolution).  
+
+### `.exec([name,] fn)`
+Initializes a new performance instance right before executing the given function, and automatically ends after the execution is done.  
+
+**Parameters:**  
+
+ - *name* `String` — Optional. Unique name of the performance instance. Set this if you want the keep the instance for later use (such as getting the result at a later time).  
+ - *fn* `Function` — Required. Function to be executed. This function is invoked with an optional `done` argument which is only required if you are running an asynchronous operation. You should omit the `done` argument if it's a synchronous operation.  
+
+**returns** `Object|perfy` — Returns a result object if running a **synchronous** operation (by omitting `done`).  
+```js
+    function syncOp() {
+        // sync operation
+    }
+    var result = perfy.exec(syncOp);
+```
+Otherwise (if **asynchronous**), immediately returns the `perfy` object and result will be returned by calling `done()` from within `fn`.   
+```js
+    perfy.exec(function (done) {
+        // a-sync operation
+        var result = done();
+        // perfy.count() === 0 // (auto-destroyed)
+    });
+```
+You can also save this performance instance by setting the name.  
+```js
+    perfy.exec('async-op', function (done) {
+        // a-sync operation
+        done();
+        perfy.exists('async-op'); // —> true (saved)
+    });
+```
 
 ### `.result(name)`
 Gets the calculated result of the performance instance for the given name. To be used with non-destroyed, ended instances. If instance is not yet ended or does not exist at all, returns `null`.  
@@ -96,7 +137,7 @@ Gets the total number of existing performance instances.
 
 **returns** `Number`  
 
-## Examples:  
+## More Examples:  
 
 Basic:
 ```js
@@ -128,16 +169,31 @@ Destroy all:
     perfy.destroyAll().count(); // —> 0
 ```
 
+Save/exec async:
+```js
+    perfy
+        .exec('async-op', function (done) {
+            var result = done(); // === perfy.result('async-op')
+            perfy.count(); // 1
+        })
+        .count(); // 0 (sync)
+```
+
 ## Changelog
 
-- **v1.0.0** (2015-10-12)  
-    + First release.
+- **v1.1.0** (2015-10-16)  
+    + Added `.exec()` convenience method.  
+    + `.exists()` will throw if no `name` is specified.  
     
     ---
-
+    
 - **v1.0.1** (2015-10-12)  
-    + `.result(name)` will not throw (and return `null`) even if the perf-instance does not exist.  
+    + `.result(name)` will not throw (and return `null`) even if the perf-instance does not exist. It will throw if no name is specified.  
     
     ---
-
- 
+    
+- **v1.0.0** (2015-10-12)  
+    + First release.  
+    
+    ---
+    

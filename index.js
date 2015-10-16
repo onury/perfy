@@ -22,7 +22,7 @@ module.exports = (function () {
     //---------------------------------
 
     function PerfyItem(name) {
-        this.name = name || 'PerfyItem';
+        this.name = name;
         this.reset();
     }
 
@@ -52,7 +52,7 @@ module.exports = (function () {
         this.utc.end = Date.now();
 
         var o = {
-            name: this.name,
+            name: this.name || '',
             seconds: this.time.end[0],
             nanoseconds: this.time.end[1],
             // divide by a million to convert nanoseconds to milliseconds
@@ -61,7 +61,8 @@ module.exports = (function () {
             endTime: this.utc.end
         };
         o.time = parseFloat(o.seconds + '.' + Math.round(o.milliseconds));
-        o.summary = this.name + ': ' + o.time.toFixed(3) + ' sec.';
+        var n = this.name ? this.name + ': ' : '';
+        o.summary = n + o.time.toFixed(3) + ' sec.';
         this.result = o;
         return o;
     };
@@ -73,11 +74,14 @@ module.exports = (function () {
     // storage for PerfyItem instances
     var perfList = {},
         perfy = {},
-        ERR_NAME_REQ = 'Performance instance name required!',
-        ERR_NOITEM = 'No performance instance with name: ';
+        ERR = {
+            NAME: 'Performance instance name required!',
+            NOITEM: 'No performance instance with name: ',
+            CALLBACK: 'Callback is not a function!'
+        };
 
     perfy.start = function (name, autoDestroy) {
-        if (!name) { throw new Error(ERR_NAME_REQ); }
+        if (!name) { throw new Error(ERR.NAME); }
         name = String(name);
         autoDestroy = autoDestroy === undefined ? true : autoDestroy;
         perfList[name] = new PerfyItem(name);
@@ -87,10 +91,10 @@ module.exports = (function () {
     };
 
     perfy.end = function (name) {
-        if (!name) { throw new Error(ERR_NAME_REQ); }
+        if (!name) { throw new Error(ERR.NAME); }
         name = String(name);
         var p = perfList[name];
-        if (!p) { throw new Error(ERR_NOITEM + name); }
+        if (!p) { throw new Error(ERR.NOITEM + name); }
         // if already ended and has result, return
         if (p.result) { return p.result; }
         var result = p.end();
@@ -101,16 +105,15 @@ module.exports = (function () {
     };
 
     perfy.result = function (name) {
-        if (!name) { throw new Error(ERR_NAME_REQ); }
+        if (!name) { throw new Error(ERR.NAME); }
         name = String(name);
         var p = perfList[name];
-        if (!p) {
-            return null;
-        }
+        if (!p) { return null; }
         return p.result;
     };
 
     perfy.exists = function (name) {
+        if (!name) { throw new Error(ERR.NAME); }
         return !!perfList[name];
     };
 
@@ -123,6 +126,7 @@ module.exports = (function () {
     };
 
     perfy.destroy = function (name) {
+        if (!name) { throw new Error(ERR.NAME); }
         if (perfList[name]) {
             delete perfList[name];
         }
@@ -132,6 +136,40 @@ module.exports = (function () {
     perfy.destroyAll = function () {
         perfList = {};
         return perfy;
+    };
+
+    perfy.exec = function (name, fn) {
+        if (typeof fn !== 'function') {
+            if (typeof name === 'function') {
+                fn = name;
+                name = null;
+            } else {
+                throw new Error(ERR.CALLBACK);
+            }
+        }
+
+        var p;
+        if (name) {
+            perfList[name] = new PerfyItem(name);
+            perfList[name].autoDestroy = false;
+            p = perfList[name];
+        } else {
+            p = new PerfyItem();
+        }
+        function done() {
+            var result = p.end();
+            if (name && p.autoDestroy) {
+                delete perfList[name];
+            }
+            return result;
+        }
+        p.start();
+        if (fn.length > 0) {
+            fn(done);
+            return perfy;
+        }
+        fn();
+        return done();
     };
 
     //---------------------------------
