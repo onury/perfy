@@ -112,7 +112,8 @@ describe('Test: perfy', function () {
     it('should save/exec named async', function (jasmineDone) {
         perfy.exec('async-op', function (done) {
             setTimeout(function () {
-                done();
+                var result = done();
+                expect(result.name).toEqual('async-op');
                 expect(perfy.count()).toEqual(1);
                 jasmineDone();
             }, 1100);
