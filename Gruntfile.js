@@ -1,5 +1,3 @@
-/*jslint node, white, this, for */
-
 module.exports = function (grunt) {
     'use strict';
 

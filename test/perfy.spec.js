@@ -1,6 +1,3 @@
-/*jslint node, white, this, for */
-/*global jasmine, describe, xdescribe, fdescribe, before, beforeAll, beforeEach, after, afterAll, afterEach, it, fit, xit, expect, mostRecentAjaxRequest, qq, runs, spyOn, spyOnEvent, waitsFor, confirm, context */
-
 /**
  *  Test: perfy
  *  @module perfy.spec

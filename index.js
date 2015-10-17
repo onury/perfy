@@ -1,5 +1,3 @@
-/*jslint node, white, this, for */
-
 /**
  *  A simple, light-weight NodeJS utility for measuring code execution in high-resolution real times.
  *

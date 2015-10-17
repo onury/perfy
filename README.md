@@ -16,21 +16,21 @@ A simple, light-weight NodeJS utility for measuring code execution in high-resol
 
 Simple. Just call `perfy.start('unique-name')` and the performance instance will be created and start time will be set until you call `perfy.end('unique-name')` which returns a result object containing the high-res elapsed time information (and destroys the created instance).
 
-```js
-    var perfy = require('perfy');
+```js  
+var perfy = require('perfy');
 
-    perfy.start('loop-stuff');
-    // some heavy stuff here...
-    var result = perfy.end('loop-stuff');
-    console.log(result.summary); // —> loop-stuff: 1.459 sec.
+perfy.start('loop-stuff');
+// some heavy stuff here...
+var result = perfy.end('loop-stuff');
+console.log(result.summary); // —> loop-stuff: 1.459 sec.
 ```
 ... or you could:
 ```js
-    perfy.exec('async-stuff', function (done) {
-        // some heavy stuff here...
-        var result = done();
-        console.log(result.summary); // —> async-stuff: 1.459 sec.
-    });    
+perfy.exec('async-stuff', function (done) {
+    // some heavy stuff here...
+    var result = done();
+    console.log(result.summary); // —> async-stuff: 1.459 sec.
+});    
 ```
 
 ## Documentation
@@ -73,26 +73,26 @@ Initializes a new performance instance right before executing the given function
 
 **returns** `Object|perfy` — Returns a result object if running a **synchronous** operation (by omitting `done`).  
 ```js
-    function syncOp() {
-        // sync operation
-    }
-    var result = perfy.exec(syncOp);
+function syncOp() {
+    // sync operation
+}
+var result = perfy.exec(syncOp);
 ```
 Otherwise (if **asynchronous**), immediately returns the `perfy` object and result will be returned by calling `done()` from within `fn`.   
 ```js
-    perfy.exec(function (done) {
-        // a-sync operation
-        var result = done();
-        // perfy.count() === 0 // (auto-destroyed)
-    });
+perfy.exec(function (done) {
+    // a-sync operation
+    var result = done();
+    // perfy.count() === 0 // (auto-destroyed)
+});
 ```
 You can also save this performance instance by setting the name.  
 ```js
-    perfy.exec('async-op', function (done) {
-        // a-sync operation
-        done();
-        perfy.exists('async-op'); // —> true (saved)
-    });
+perfy.exec('async-op', function (done) {
+    // a-sync operation
+    done();
+    perfy.exists('async-op'); // —> true (saved)
+});
 ```
 
 ### `.result(name)`
@@ -141,42 +141,42 @@ Gets the total number of existing performance instances.
 
 Basic:
 ```js
-    perfy.start('metric-1');
-    var result1 = perfy.end('metric-1');
-    console.log(result1.seconds + ' sec, ' + result1.milliseconds.toFixed(3) + ' ms.');
-    // —> 1 sec, 234 ms.
-    // OR
-    console.log(result1.time + ' sec. ');
-    // —> 1.234 sec.
+perfy.start('metric-1');
+var result1 = perfy.end('metric-1');
+console.log(result1.seconds + ' sec, ' + result1.milliseconds.toFixed(3) + ' ms.');
+// —> 1 sec, 234 ms.
+// OR
+console.log(result1.time + ' sec. ');
+// —> 1.234 sec.
 ```
 
 Auto-Destroy:
 ```js
-    perfy.start('metric-2').count(); // —> 1 (metric-1 is already destroyed)
-    var result2 = perfy.end('metric-2');
-    perfy.count(); // —> 0 (metric-2 is also destroyed after .end() is called)
+perfy.start('metric-2').count(); // —> 1 (metric-1 is already destroyed)
+var result2 = perfy.end('metric-2');
+perfy.count(); // —> 0 (metric-2 is also destroyed after .end() is called)
 ```
 
 Keep the instance (disable `autoDestroy`):
 ```js
-    perfy.start('metric-3', false);
-    perfy.end('metric-3').time; // —> 0.123
-    perfy.exists('metric-3'); // —> true
+perfy.start('metric-3', false);
+perfy.end('metric-3').time; // —> 0.123
+perfy.exists('metric-3'); // —> true
 ```
 
 Destroy all:
 ```js
-    perfy.destroyAll().count(); // —> 0
+perfy.destroyAll().count(); // —> 0
 ```
 
 Save/exec async:
 ```js
-    perfy
-        .exec('async-op', function (done) {
-            var result = done(); // === perfy.result('async-op')
-            perfy.count(); // 1
-        })
-        .count(); // 0 (sync)
+perfy
+    .exec('async-op', function (done) {
+        var result = done(); // === perfy.result('async-op')
+        perfy.count(); // 1
+    })
+    .count(); // 0 (sync)
 ```
 
 ## Changelog
@@ -184,16 +184,15 @@ Save/exec async:
 - **v1.1.0** (2015-10-16)  
     + Added `.exec()` convenience method.  
     + `.exists()` will throw if no `name` is specified.  
-    
+
     ---
-    
+
 - **v1.0.1** (2015-10-12)  
     + `.result(name)` will not throw (and return `null`) even if the perf-instance does not exist. It will throw if no name is specified.  
-    
+
     ---
-    
+
 - **v1.0.0** (2015-10-12)  
     + First release.  
-    
+
     ---
-    
