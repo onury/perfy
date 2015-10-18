@@ -6,13 +6,10 @@
 ![dependencies](https://david-dm.org/onury/perfy.svg)
 ![license](http://img.shields.io/npm/l/perfy.svg)  
 
-
-
-
 A simple, light-weight Node.js utility for measuring code execution in high-resolution real times.
 
-> Author: Onur Yıldırım (onury) © 2015  
-> Licensed under the MIT License.  
+> Author: Onur Yıldırım (@onury)  
+> © 2015 — Licensed under the MIT License.  
 
 ## Installation
 
