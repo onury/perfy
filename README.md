@@ -1,5 +1,14 @@
 # perfy
 
+[![version](http://img.shields.io/npm/v/perfy.svg)](https://www.npmjs.com/package/perfy)
+![release](https://img.shields.io/github/release/onury/perfy.svg)
+[![downloads](http://img.shields.io/npm/dm/perfy.svg)](https://www.npmjs.com/package/perfy)
+![dependencies](https://david-dm.org/onury/perfy.svg)
+![license](http://img.shields.io/npm/l/perfy.svg)  
+
+
+
+
 A simple, light-weight Node.js utility for measuring code execution in high-resolution real times.
 
 > Version: 1.1.0  
