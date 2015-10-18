@@ -1,6 +1,6 @@
 # perfy
 
-A simple, light-weight NodeJS utility for measuring code execution in high-resolution real times.
+A simple, light-weight Node.js utility for measuring code execution in high-resolution real times.
 
 > Version: 1.1.0  
 > Author: Onur Yıldırım (onury) © 2015  
