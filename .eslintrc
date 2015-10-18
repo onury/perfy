@@ -1,0 +1,22 @@
+{
+    "env": {
+        "node": true,
+        "jasmine": true
+    },
+    "ecmaFeatures": {
+        "modules": true
+    },
+    "rules": {
+        "indent": [2, 4],
+        "brace-style": [0, "1tbs"],
+        "quotes": [2, "single"],
+        "no-extra-strict": 0,
+        "no-unused-vars": 1,
+        "no-console": 1,
+        "no-use-before-define": [2, "nofunc"],
+        "no-underscore-dangle": 0,
+        "no-constant-condition": 0,
+        "space-before-function-paren": [2, {"anonymous": "always", "named": "never"}],
+        "func-style": [2, "declaration"]
+    }
+}
