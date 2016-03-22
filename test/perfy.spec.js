@@ -22,6 +22,16 @@ describe('Test: perfy', function () {
         }, 345);
     });
 
+    it('should return zero pad milliseconds in time and summary', function (done) {
+        perfy.start('m1');
+        setTimeout(function () {
+            var result = perfy.end('m1');
+            expect(result.time).toEqual(Number('0.0' + Math.round(result.milliseconds)));
+            expect(result.summary).toEqual('m1: ' + '0.0' + Math.round(result.milliseconds) + ' sec.');
+            done();
+        }, 15);
+    });
+
     it('should keep/destroy/auto-destroy perf instance', function (done) {
         expect(perfy.exists('m1')).toEqual(false);
         perfy.start('m2', false);
