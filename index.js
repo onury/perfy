@@ -1,3 +1,5 @@
+/* eslint no-param-reassign:0 */
+
 /**
  *  A simple, light-weight NodeJS utility for measuring code execution in high-resolution real times.
  *
@@ -8,16 +10,15 @@
  *      var perfy = require('perfy');
  *      perfy.start('loop-test');
  *      // some heavy stuff here...
- *      console.log(perfy.end('loop-test').summary);
+ *      console.log(perfy.end('loop-test').time);
  */
 module.exports = (function () {
-    'use strict';
 
     // See https://nodejs.org/api/process.html#process_process_hrtime
 
-    //---------------------------------
+    // --------------------------------
     //  CLASS: PerfyItem
-    //---------------------------------
+    // --------------------------------
 
     function PerfyItem(name) {
         this.name = name;
@@ -65,9 +66,9 @@ module.exports = (function () {
         return o;
     };
 
-    //---------------------------------
+    // --------------------------------
     //  CLASS: perfy
-    //---------------------------------
+    // --------------------------------
 
     // storage for PerfyItem instances
     var perfList = {},
@@ -81,7 +82,7 @@ module.exports = (function () {
     perfy.start = function (name, autoDestroy) {
         if (!name) { throw new Error(ERR.NAME); }
         name = String(name);
-        autoDestroy = autoDestroy === undefined ? true : autoDestroy;
+        autoDestroy = typeof autoDestroy === 'undefined' ? true : autoDestroy;
         perfList[name] = new PerfyItem(name);
         perfList[name].autoDestroy = autoDestroy;
         perfList[name].start();
@@ -112,7 +113,7 @@ module.exports = (function () {
 
     perfy.exists = function (name) {
         if (!name) { throw new Error(ERR.NAME); }
-        return !!perfList[name];
+        return Boolean(perfList[name]);
     };
 
     perfy.names = function () {
@@ -170,9 +171,9 @@ module.exports = (function () {
         return done();
     };
 
-    //---------------------------------
+    // --------------------------------
     //  EXPORT
-    //---------------------------------
+    // --------------------------------
 
     return perfy;
 

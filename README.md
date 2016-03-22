@@ -2,10 +2,11 @@
 
 [![version](http://img.shields.io/npm/v/perfy.svg)](https://www.npmjs.com/package/perfy)
 [![downloads](http://img.shields.io/npm/dm/perfy.svg)](https://www.npmjs.com/package/perfy)
+[![Code Climate](https://codeclimate.com/github/onury/perfy/badges/gpa.svg)](https://codeclimate.com/github/onury/perfy)
 ![dependencies](https://david-dm.org/onury/perfy.svg)
 ![license](http://img.shields.io/npm/l/perfy.svg)  
 
-A simple, light-weight Node.js utility for measuring code execution in high-resolution real times.
+A simple, light-weight Node.js utility for measuring code execution performance in high-resolution real times.
 
 > Author: Onur Yıldırım (@onury)  
 > © 2015 — Licensed under the MIT License.  
@@ -18,22 +19,24 @@ A simple, light-weight Node.js utility for measuring code execution in high-reso
 
 ## Usage
 
-Simple. Just call `perfy.start('unique-name')` and the performance instance will be created and start time will be set until you call `perfy.end('unique-name')` which returns a result object containing the high-res elapsed time information (and destroys the created instance).
-
 ```js  
 var perfy = require('perfy');
+```
 
+Simple. Just call `perfy.start('name')` and the performance instance will be created and start time will be set until you call `perfy.end('name')` which returns a result object containing the high-res elapsed time information (and destroys the created instance).
+
+```js  
 perfy.start('loop-stuff');
 // some heavy stuff here...
 var result = perfy.end('loop-stuff');
-console.log(result.summary); // —> loop-stuff: 1.459 sec.
+console.log(result.time); // —> 1.459 (sec.)
 ```
 ... or you could:
 ```js
 perfy.exec('async-stuff', function (done) {
     // some heavy stuff here...
     var result = done();
-    console.log(result.summary); // —> async-stuff: 1.459 sec.
+    console.log(result.time); // —> 1.459 (sec.)
 });    
 ```
 
@@ -184,6 +187,12 @@ perfy
 ```
 
 ## Changelog
+
+- **v1.1.2** (2016-03-23)  
+    + Fixed `time` and `summary` padding issue. (PR [#1](https://github.com/onury/perfy/pull/1) by [@gunnarlium](https://github.com/gunnarlium))
+    + Other minor dev improvements.
+
+    ---
 
 - **v1.1.0** (2015-10-16)  
     + Added `.exec()` convenience method.  

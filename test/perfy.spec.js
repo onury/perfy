@@ -1,11 +1,11 @@
+
+var perfy = require('../index');
+
 /**
  *  Test: perfy
  *  @module perfy.spec
  */
 describe('Test: perfy', function () {
-    'use strict';
-
-    var perfy = require('../index');
 
     // beforeAll(function () {});
 
@@ -60,7 +60,7 @@ describe('Test: perfy', function () {
 
     it('should get result', function () {
         var result = perfy.result('m2');
-        expect(!!result).toEqual(true);
+        expect(Boolean(result)).toEqual(true);
         expect(result.time).toEqual(jasmine.any(Number));
     });
 
@@ -92,7 +92,7 @@ describe('Test: perfy', function () {
     });
 
     it('should save/exec named sync', function () {
-        var name ='sync-op',
+        var name = 'sync-op',
             result = perfy.exec(name, function () {
                 var i = 0;
                 while (i < 10000) { i += 1; }

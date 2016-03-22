@@ -1,5 +1,6 @@
+/* eslint camelcase:0 */
+
 module.exports = function (grunt) {
-    'use strict';
 
     grunt.initConfig({
         jasmine_nodejs: grunt.file.readYAML('config/jasmine.conf.yml')
