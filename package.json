@@ -28,6 +28,7 @@
     "execution",
     "time",
     "benchmark",
+    "profile",
     "elapsed"
   ],
   "bugs": {
