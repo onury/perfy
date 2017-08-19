@@ -1,15 +1,16 @@
 # perfy
 
-[![version](http://img.shields.io/npm/v/perfy.svg)](https://www.npmjs.com/package/perfy)
+[![npm](http://img.shields.io/npm/v/perfy.svg)](https://www.npmjs.com/package/perfy)
+[![release](https://img.shields.io/github/release/onury/perfy.svg)](https://github.com/onury/perfy)
 [![downloads](http://img.shields.io/npm/dm/perfy.svg)](https://www.npmjs.com/package/perfy)
 [![Code Climate](https://codeclimate.com/github/onury/perfy/badges/gpa.svg)](https://codeclimate.com/github/onury/perfy)
-![dependencies](https://david-dm.org/onury/perfy.svg)
-![license](http://img.shields.io/npm/l/perfy.svg)  
+[![dependencies](https://david-dm.org/onury/perfy.svg)](https://david-dm.org/onury/perfy)
+[![license](http://img.shields.io/npm/l/perfy.svg)](https://github.com/onury/perfy/blob/master/LICENSE)
+![maintained](https://img.shields.io/maintenance/yes/2017.svg)  
 
 A simple, light-weight Node.js utility for measuring code execution performance in high-resolution real times.
 
-> Author: Onur Yıldırım (@onury)  
-> © 2015 — Licensed under the MIT License.  
+> © 2017, Onur Yıldırım ([@onury][onury]). MIT License.
 
 ## Installation
 
@@ -209,3 +210,6 @@ perfy
     + First release.  
 
     ---
+
+
+[onury]:https://github.com/onury
