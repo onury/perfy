@@ -6,11 +6,11 @@
 [![Code Climate](https://codeclimate.com/github/onury/perfy/badges/gpa.svg)](https://codeclimate.com/github/onury/perfy)
 [![dependencies](https://david-dm.org/onury/perfy.svg)](https://david-dm.org/onury/perfy)
 [![license](http://img.shields.io/npm/l/perfy.svg)](https://github.com/onury/perfy/blob/master/LICENSE)
-![maintained](https://img.shields.io/maintenance/yes/2017.svg)  
+![maintained](https://img.shields.io/maintenance/yes/2018.svg)  
 
 A simple, light-weight Node.js utility for measuring code execution performance in high-resolution real times.
 
-> © 2017, Onur Yıldırım ([@onury][onury]). MIT License.
+> © 2018, Onur Yıldırım ([@onury][onury]). MIT License.
 
 ## Installation
 
