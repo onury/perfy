@@ -3,7 +3,6 @@
 [![npm](http://img.shields.io/npm/v/perfy.svg)](https://www.npmjs.com/package/perfy)
 [![release](https://img.shields.io/github/release/onury/perfy.svg)](https://github.com/onury/perfy)
 [![downloads](http://img.shields.io/npm/dm/perfy.svg)](https://www.npmjs.com/package/perfy)
-[![Code Climate](https://codeclimate.com/github/onury/perfy/badges/gpa.svg)](https://codeclimate.com/github/onury/perfy)
 [![dependencies](https://david-dm.org/onury/perfy.svg)](https://david-dm.org/onury/perfy)
 [![license](http://img.shields.io/npm/l/perfy.svg)](https://github.com/onury/perfy/blob/master/LICENSE)
 ![maintained](https://img.shields.io/maintenance/yes/2018.svg)  

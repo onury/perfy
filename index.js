@@ -4,7 +4,7 @@
  *  A simple, light-weight NodeJS utility for measuring code execution in high-resolution real times.
  *
  *  @module   perfy
- *  @author   Onur Yıldırım (onur@cutepilot.com)
+ *  @author   Onur Yıldırım <onur@cutepilot.com>
  *  @license  MIT
  *  @example
  *      var perfy = require('perfy');
