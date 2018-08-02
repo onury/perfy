@@ -59,7 +59,9 @@ module.exports = (function () {
             startTime: this.utc.start,
             endTime: this.utc.end
         };
-        o.time = Number(((o.seconds * 1000 + o.milliseconds) / 1000).toFixed(3));
+        o.timeinMilliseconds = o.seconds * 1000 + o.milliseconds;
+        o.time = Number((o.timeinMilliseconds / 1000).toFixed(3));
+        o.timeinMilliseconds = Number(o.timeinMilliseconds.toFixed(3));
         var n = this.name ? this.name + ': ' : '';
         o.summary = n + o.time + ' sec.';
         this.result = o;
