@@ -15,6 +15,7 @@ describe('Test: perfy', function () {
             var result = perfy.end('m1');
             expect(result).toEqual(jasmine.any(Object));
             expect(result.time).toEqual(jasmine.any(Number));
+            expect(result.timeinMilliseconds).toEqual(jasmine.any(Number));
             expect(result.nanoseconds).toEqual(jasmine.any(Number));
             expect(result.milliseconds).toEqual(jasmine.any(Number));
             expect(perfy.count()).toEqual(0);
