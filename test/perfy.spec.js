@@ -10,17 +10,37 @@ describe('Test: perfy', function () {
     // beforeAll(function () {});
 
     it('should return elapsed time', function (done) {
+        var timeout = 1233;
+        var offset = 500;
+        var timeoutMax = timeout + offset;
+        var secs = parseInt(timeout / 1000, 10);
+        var secsMax = secs + 1;
+        var ms = timeout % 1000;
+        var msMax = ms + offset;
+        var nsMin = secs * 1000 * 1000000;
+
         perfy.start('m1');
         setTimeout(function () {
             var result = perfy.end('m1');
             expect(result).toEqual(jasmine.any(Object));
+            // console.log(result);
+            expect(result.seconds).toEqual(secs);
             expect(result.time).toEqual(jasmine.any(Number));
-            expect(result.timeinMilliseconds).toEqual(jasmine.any(Number));
-            expect(result.nanoseconds).toEqual(jasmine.any(Number));
+            expect(result.time).toBeGreaterThan(secs);
+            expect(result.time).toBeLessThan(secsMax);
+            expect(result.fullSeconds).toEqual(result.time);
             expect(result.milliseconds).toEqual(jasmine.any(Number));
+            expect(result.milliseconds).toBeGreaterThan(ms);
+            expect(result.milliseconds).toBeLessThan(msMax);
+            expect(result.fullMilliseconds).toEqual(jasmine.any(Number));
+            expect(result.fullMilliseconds).toBeGreaterThan(timeout);
+            expect(result.fullMilliseconds).toBeLessThan(timeoutMax);
+            expect(result.nanoseconds).toEqual(jasmine.any(Number));
+            expect(result.fullNanoseconds).toBeGreaterThan(nsMin);
+            expect(result.fullNanoseconds).toEqual(nsMin + result.nanoseconds);
             expect(perfy.count()).toEqual(0);
             done();
-        }, 345);
+        }, timeout);
     });
 
     it('should return zero pad milliseconds in time and summary', function (done) {
