@@ -9,6 +9,7 @@ A ground-up modernization. Perfy is now written in **TypeScript**, ships as **ES
 ### Added
 
 - **Universal high-resolution clock.** Perfy now picks the most precise clock available: `process.hrtime.bigint()` on Node.js (exact integer nanoseconds), falling back to `performance.now()` in browsers, Deno, Bun and workers. Elapsed time is computed with integer-nanosecond math, so it no longer accumulates floating-point drift. This resolves the long-standing browser-support request.
+- **Async/await support in `exec()`.** A task that returns a promise is now awaited, and `exec` resolves to the result: `const r = await perfy.exec('io', async () => { await work(); });`. The callback (`done`) form and synchronous form still work unchanged.
 - **First-class TypeScript types**, including the `IPerfyResult` contract, bundled with the package.
 - **`Perfy` class** — construct your own isolated registry with `new Perfy()`, instead of only the shared singleton. Optionally inject a custom `NanoClock` (handy for deterministic tests).
 - **`PerfyError`** — every failure now throws a typed error carrying a stable, machine-readable `code`: `NAME_REQUIRED`, `NO_INSTANCE`, `NOT_STARTED`, `INVALID_CALLBACK`, `NO_CLOCK`.

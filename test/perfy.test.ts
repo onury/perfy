@@ -161,6 +161,41 @@ describe('Perfy', () => {
       expect(perfy.exists('async-job')).toBe(true);
     });
 
+    it('times a promise-returning task, resolving to the result', async () => {
+      const perfy = perfyOf();
+      const result = await perfy.exec(async () => {
+        await Promise.resolve();
+      });
+      expect(result).toEqual(expect.objectContaining({ name: '', time: 1 }));
+      expect(perfy.count()).toBe(0);
+    });
+
+    it('saves a named promise task and ends it only once the promise settles', async () => {
+      const perfy = perfyOf();
+      const returned = perfy.exec('io', () => Promise.resolve('x'));
+      expect(returned).toBeInstanceOf(Promise);
+      expect(perfy.result('io')).toBeNull();
+      const result = await returned;
+      expect(result.name).toBe('io');
+      expect(perfy.result('io')).toBe(result);
+    });
+
+    it('propagates a rejected promise task without producing a result', async () => {
+      const perfy = perfyOf();
+      await expect(perfy.exec('io', () => Promise.reject(new Error('boom')))).rejects.toThrow(
+        'boom'
+      );
+      expect(perfy.exists('io')).toBe(true);
+      expect(perfy.result('io')).toBeNull();
+    });
+
+    it('treats a task returning a non-thenable value as synchronous', () => {
+      const perfy = perfyOf();
+      const result = perfy.exec(() => ({ notAPromise: true }));
+      expect(result).not.toBeInstanceOf(Promise);
+      expect(result.time).toBe(1);
+    });
+
     it('throws INVALID_CALLBACK when no task function is given', () => {
       const perfy = perfyOf();
       const err = errOf(() => (perfy.exec as unknown as (n: string) => unknown)('job'));

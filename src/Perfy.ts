@@ -3,14 +3,19 @@ import { PerfyError } from './PerfyError.js';
 import { PerfyItem } from './PerfyItem.js';
 import type { IPerfyResult } from './types/index.js';
 
-/** Callback handed to an asynchronous {@link Perfy.exec} task; ends the timer. */
+/** Callback handed to a callback-style asynchronous {@link Perfy.exec} task; ends the timer. */
 export type DoneFn = () => IPerfyResult;
 /** A synchronous task for {@link Perfy.exec} — timed and ended automatically. */
 export type SyncTask = () => void;
-/** An asynchronous task for {@link Perfy.exec} — ended by calling `done`. */
+/** A callback-style asynchronous task for {@link Perfy.exec} — ended by calling `done`. */
 export type AsyncTask = (done: DoneFn) => void;
+/** A promise-returning task for {@link Perfy.exec} — timed until its promise settles. */
+export type PromiseTask = () => PromiseLike<unknown>;
 /** Any task accepted by {@link Perfy.exec}. */
-export type PerfyTask = SyncTask | AsyncTask;
+export type PerfyTask = SyncTask | AsyncTask | PromiseTask;
+
+const isThenable = (value: unknown): value is PromiseLike<unknown> =>
+  value != null && typeof (value as { then?: unknown }).then === 'function';
 
 /**
  *  A registry of named, high-resolution performance timers.
@@ -141,20 +146,29 @@ export class Perfy {
 
   /**
    *  Times the execution of `task`, starting right before and ending right
-   *  after it runs. A **synchronous** task (arity 0) is ended automatically and
-   *  its result returned. An **asynchronous** task (arity ≥ 1) receives a `done`
-   *  callback it must call to end the timer and obtain the result; `exec` then
-   *  returns this `Perfy` instance immediately. Pass a `name` to keep the
-   *  instance for later retrieval via {@link Perfy.result}.
+   *  after it runs. Perfy picks the mode from the task itself:
+   *
+   *  - **Synchronous** (returns a non-thenable): ended automatically, its
+   *    result returned.
+   *  - **Promise-returning**: `exec` awaits the returned promise and resolves
+   *    to the result. A rejected promise is propagated (no result is produced).
+   *  - **Callback-style** (declares a `done` parameter): must call `done()` to
+   *    end the timer and obtain the result; `exec` returns this `Perfy`
+   *    instance immediately.
+   *
+   *  Pass a `name` to keep the instance for later retrieval via
+   *  {@link Perfy.result}.
    *
    *  @throws {PerfyError} `INVALID_CALLBACK` when no task function is given,
    *  `NAME_REQUIRED` when a `name` is given but empty.
    */
+  exec(task: PromiseTask): Promise<IPerfyResult>;
   exec(task: SyncTask): IPerfyResult;
   exec(task: AsyncTask): this;
+  exec(name: string, task: PromiseTask): Promise<IPerfyResult>;
   exec(name: string, task: SyncTask): IPerfyResult;
   exec(name: string, task: AsyncTask): this;
-  exec(name: string | PerfyTask, task?: PerfyTask): IPerfyResult | this {
+  exec(name: string | PerfyTask, task?: PerfyTask): IPerfyResult | this | Promise<IPerfyResult> {
     let key: string | null;
     let fn: PerfyTask;
     if (typeof name === 'function') {
@@ -178,7 +192,10 @@ export class Perfy {
       (fn as AsyncTask)(done);
       return this;
     }
-    (fn as SyncTask)();
+    const returned = (fn as SyncTask | PromiseTask)();
+    if (isThenable(returned)) {
+      return Promise.resolve(returned).then(done);
+    }
     return done();
   }
 
