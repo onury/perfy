@@ -15,7 +15,7 @@ export type PerfyErrorCode =
  *
  *  @example
  *  ```ts
- *  import perfy, { PerfyError } from 'perfy';
+ *  import { perfy, PerfyError } from 'perfy';
  *
  *  try {
  *    perfy.end('never-started');

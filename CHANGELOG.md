@@ -13,7 +13,7 @@ A ground-up modernization. Perfy is now written in **TypeScript**, ships as **ES
 - **First-class TypeScript types**, including the `IPerfyResult` contract, bundled with the package.
 - **`Perfy` class** — construct your own isolated registry with `new Perfy()`, instead of only the shared singleton. Optionally inject a custom `NanoClock` (handy for deterministic tests).
 - **`PerfyError`** — every failure now throws a typed error carrying a stable, machine-readable `code`: `NAME_REQUIRED`, `NO_INSTANCE`, `NOT_STARTED`, `INVALID_CALLBACK`, `NO_CLOCK`.
-- **Named exports** — `perfy` (the singleton, also the default export), `Perfy`, `PerfyItem`, `PerfyError`, `createNanoClock`, `defaultNanoClock`, and all types.
+- **Named exports** — `perfy` (the shared singleton), `Perfy`, `PerfyItem`, `PerfyError`, `createNanoClock`, `defaultNanoClock`, and all types.
 
 ### Changed
 
@@ -29,7 +29,7 @@ A ground-up modernization. Perfy is now written in **TypeScript**, ships as **ES
 - **CommonJS `require('perfy')` is gone.** Import it instead:
   ```diff
   - const perfy = require('perfy');
-  + import perfy from 'perfy';
+  + import { perfy } from 'perfy';
   ```
 - **Node.js ≥ 22** is required (older runtimes and browsers work via the `performance.now()` fallback).
 - **The result object was streamlined.** `time`, `summary`, `startTime` and `endTime` are unchanged. The unit fields now always report the **total** elapsed time (they previously reported only the sub-second portion), and the `full*` aliases were dropped:

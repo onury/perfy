@@ -20,13 +20,13 @@ const isThenable = (value: unknown): value is PromiseLike<unknown> =>
 /**
  *  A registry of named, high-resolution performance timers.
  *
- *  The default export is a shared singleton instance — the common way to use
+ *  The exported `perfy` is a shared singleton instance — the common way to use
  *  the library. Construct your own `Perfy` when you want an isolated registry
  *  or a custom clock (e.g. a deterministic clock in tests).
  *
  *  @example
  *  ```ts
- *  import perfy from 'perfy';
+ *  import { perfy } from 'perfy';
  *
  *  perfy.start('loop');
  *  // ...heavy work...
@@ -207,5 +207,5 @@ export class Perfy {
   }
 }
 
-/** Shared singleton `Perfy` registry — the default and simplest way to use the library. */
+/** Shared singleton `Perfy` registry — the simplest way to use the library. */
 export const perfy = new Perfy();

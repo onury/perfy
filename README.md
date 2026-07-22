@@ -17,7 +17,7 @@
 A tiny, **zero-dependency** utility for measuring code execution time in **high-resolution real time** — named timers, one-shot `exec()` wrappers, and a rich elapsed-time result. Runs in **Node.js, browsers, Deno and Bun**.
 
 ```ts
-import perfy from 'perfy';
+import { perfy } from 'perfy';
 
 perfy.start('loop');
 // ...heavy work...
@@ -38,7 +38,7 @@ npm install perfy
 Call `perfy.start('name')` to create a timer and mark its start, then `perfy.end('name')` to get the elapsed-time [result](#the-result-object). By default the instance is destroyed once ended.
 
 ```ts
-import perfy from 'perfy';
+import { perfy } from 'perfy';
 
 perfy.start('loop-stuff');
 // ...some heavy stuff here...
@@ -56,7 +56,7 @@ perfy.exec('async-stuff', (done) => {
 });
 ```
 
-The default export is a shared singleton — the simplest way to use the library. When you want an **isolated registry** (or a custom clock, e.g. in tests), construct your own:
+The exported `perfy` is a shared singleton — the simplest way to use the library. When you want an **isolated registry** (or a custom clock, e.g. in tests), construct your own:
 
 ```ts
 import { Perfy } from 'perfy';
@@ -174,7 +174,7 @@ perfy.destroyAll().count(); // -> 0
 Every failure throws a `PerfyError` — an `Error` subclass carrying a stable, machine-readable `code` (`NAME_REQUIRED`, `NO_INSTANCE`, `NOT_STARTED`, `INVALID_CALLBACK`, `NO_CLOCK`):
 
 ```ts
-import perfy, { PerfyError } from 'perfy';
+import { perfy, PerfyError } from 'perfy';
 
 try {
   perfy.end('never-started');

@@ -1,20 +1,13 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import perfy, {
-  createNanoClock,
-  perfy as named,
-  Perfy,
-  PerfyError,
-  PerfyItem
-} from '../src/index.js';
+import { createNanoClock, Perfy, PerfyError, PerfyItem, perfy } from '../src/index.js';
 
 afterEach(() => {
   perfy.destroyAll();
 });
 
 describe('package exports', () => {
-  it('exposes the singleton as both the default and the named export', () => {
+  it('exposes the singleton as a named export', () => {
     expect(perfy).toBeInstanceOf(Perfy);
-    expect(named).toBe(perfy);
   });
 
   it('exposes the classes and clock factory', () => {
