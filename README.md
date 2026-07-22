@@ -64,6 +64,32 @@ import { Perfy } from 'perfy';
 const perfy = new Perfy();
 ```
 
+## Exports
+
+Everything is a **named** export (there is no default export):
+
+```ts
+import {
+  perfy,              // shared Perfy singleton — the simplest entry point
+  Perfy,              // class — construct an isolated registry: new Perfy(clock?)
+  PerfyItem,          // a single timing instance (advanced / typing)
+  PerfyError,         // Error subclass thrown on failure, with a `.code`
+  createNanoClock,    // build a NanoClock from given host objects
+  defaultNanoClock    // the NanoClock selected for this environment
+} from 'perfy';
+
+import type {
+  IPerfyResult,       // the elapsed-time result object
+  NanoClock,          // () => bigint monotonic nanosecond clock
+  PerfyErrorCode,     // 'NAME_REQUIRED' | 'NO_INSTANCE' | 'NOT_STARTED' | 'INVALID_CALLBACK' | 'NO_CLOCK'
+  DoneFn,             // the `done` callback passed to a callback-style exec task
+  SyncTask,
+  AsyncTask,
+  PromiseTask,
+  PerfyTask           // SyncTask | AsyncTask | PromiseTask
+} from 'perfy';
+```
+
 ## API
 
 Every method that takes a `name` throws a [`PerfyError`](#errors) with code `NAME_REQUIRED` when it is empty.
