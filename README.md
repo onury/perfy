@@ -199,4 +199,4 @@ See [**CHANGELOG.md**](CHANGELOG.md). **v2 is a breaking release** (ESM-only, un
 
 ## License
 
-© 2026, Onur Yıldırım ([@onury](https://github.com/onury)). [**MIT**](LICENSE) License.
+© 2026, Onur Yıldırım. [**MIT**](LICENSE) License.
