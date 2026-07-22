@@ -195,7 +195,7 @@ See [**CHANGELOG.md**](CHANGELOG.md). **v2 is a breaking release** (ESM-only, un
 
 ## Related
 
-- [**accesscontrol**](https://github.com/onury/accesscontrol) — Role & attribute based access control for Node.js.
+- [**tasktimer**](https://github.com/onury/tasktimer) — An accurate timer utility for running periodic tasks on the given interval ticks or dates.
 
 ## License
 
