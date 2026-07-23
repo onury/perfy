@@ -1,6 +1,6 @@
 {
   "name": "perfy",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "A tiny, zero-dependency utility for measuring code execution time in high-resolution real time. Works in Node.js, browsers, Deno and Bun.",
   "author": "Onur Yıldırım <onur@cutepilot.com>",
   "license": "MIT",

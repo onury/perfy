@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { Perfy } from '../src/Perfy.js';
 import { PerfyError } from '../src/PerfyError.js';
+import type { IPerfyResult } from '../src/types/index.js';
 import { clockOf } from './support.js';
 
 /** Builds a Perfy whose clock returns 0, 1e9, 2e9, ... ns (1s per reading). */
@@ -205,6 +206,75 @@ describe('Perfy', () => {
 
     it('throws NAME_REQUIRED when a named task has an empty name', () => {
       expect(errOf(() => perfyOf().exec('', () => {})).code).toBe('NAME_REQUIRED');
+    });
+  });
+
+  describe('lap', () => {
+    it('returns splits from the previous lap and keeps the total on end', () => {
+      const perfy = perfyOf(10);
+      perfy.start('m');
+      expect(perfy.lap('m').time).toBe(1); // 1e9 - 0
+      expect(perfy.lap('m').time).toBe(1); // 2e9 - 1e9
+      expect(perfy.end('m').time).toBe(3); // 3e9 - 0 (total from start)
+    });
+
+    it('throws NAME_REQUIRED / NO_INSTANCE for bad lap() calls', () => {
+      const perfy = perfyOf();
+      expect(errOf(() => perfy.lap('')).code).toBe('NAME_REQUIRED');
+      const missing = errOf(() => perfy.lap('missing'));
+      expect(missing.code).toBe('NO_INSTANCE');
+      expect(missing.message).toContain('missing');
+    });
+  });
+
+  describe('measure', () => {
+    it('ends the timer on dispose and reports the result', () => {
+      const perfy = perfyOf();
+      let captured: IPerfyResult | undefined;
+      const m = perfy.measure('block', (r) => {
+        captured = r;
+      });
+      expect(m.name).toBe('block');
+      expect(perfy.exists('block')).toBe(true);
+      expect(perfy.result('block')).toBeNull();
+
+      m[Symbol.dispose]();
+      expect(captured?.time).toBe(1);
+      expect(perfy.result('block')?.time).toBe(1);
+    });
+
+    it('works without an onEnd callback', () => {
+      const perfy = perfyOf();
+      const m = perfy.measure('block');
+      m[Symbol.dispose]();
+      expect(perfy.result('block')?.time).toBe(1);
+    });
+
+    it('is idempotent — a second dispose does nothing', () => {
+      const perfy = perfyOf();
+      let calls = 0;
+      const m = perfy.measure('block', () => {
+        calls += 1;
+      });
+      m[Symbol.dispose]();
+      m[Symbol.dispose]();
+      expect(calls).toBe(1);
+    });
+
+    it('times its scope via a `using` declaration', () => {
+      const perfy = perfyOf();
+      let captured: IPerfyResult | undefined;
+      {
+        using m = perfy.measure('scope', (r) => {
+          captured = r;
+        });
+        expect(m.name).toBe('scope');
+      }
+      expect(captured?.time).toBe(1);
+    });
+
+    it('throws NAME_REQUIRED without a name', () => {
+      expect(errOf(() => perfyOf().measure('')).code).toBe('NAME_REQUIRED');
     });
   });
 

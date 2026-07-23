@@ -2,6 +2,9 @@
   "extends": "tsconfig-oy",
   "compilerOptions": {
     "ignoreDeprecations": "6.0",
+    // ESNext.Disposable adds `Symbol.dispose` + the `Disposable` interface used
+    // by `measure()`/`using`. Node >= 22 (the engines floor) provides them natively.
+    "lib": ["ES2022", "ESNext.Disposable"],
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
     "incremental": false,
