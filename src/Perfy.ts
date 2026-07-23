@@ -14,6 +14,15 @@ export type PromiseTask = () => PromiseLike<unknown>;
 /** Any task accepted by {@link Perfy.exec}. */
 export type PerfyTask = SyncTask | AsyncTask | PromiseTask;
 
+/**
+ *  A disposable handle returned by {@link Perfy.measure}. Its `[Symbol.dispose]`
+ *  ends the timer, so a `using` declaration times its enclosing scope.
+ */
+export interface IPerfyMeasurement extends Disposable {
+  /** Name of the instance being measured. */
+  readonly name: string;
+}
+
 const isThenable = (value: unknown): value is PromiseLike<unknown> =>
   value != null && typeof (value as { then?: unknown }).then === 'function';
 
@@ -88,6 +97,26 @@ export class Perfy {
       this.#list.delete(key);
     }
     return result;
+  }
+
+  /**
+   *  Records a split for the instance `name`: the elapsed time since the
+   *  previous lap (or since `start` for the first lap), then advances the lap
+   *  marker. The instance keeps running — {@link Perfy.end} still reports the
+   *  total from `start`.
+   *
+   *  @param name - Name of the instance to lap.
+   *  @returns The split {@link IPerfyResult}.
+   *  @throws {PerfyError} `NAME_REQUIRED` when `name` is empty, `NO_INSTANCE`
+   *  when no instance exists under `name`.
+   */
+  lap(name: string): IPerfyResult {
+    const key = this.#requireName(name);
+    const item = this.#list.get(key);
+    if (!item) {
+      throw new PerfyError(`No performance instance with name: ${key}`, 'NO_INSTANCE');
+    }
+    return item.lap();
   }
 
   /**
@@ -197,6 +226,42 @@ export class Perfy {
       return Promise.resolve(returned).then(done);
     }
     return done();
+  }
+
+  /**
+   *  Starts a kept instance under `name` and returns a disposable handle whose
+   *  `[Symbol.dispose]` ends it — so a `using` declaration times its enclosing
+   *  scope automatically. The result stays retrievable via {@link Perfy.result}
+   *  after disposal; pass `onEnd` to receive it immediately. Disposing more than
+   *  once is a no-op.
+   *
+   *  @example
+   *  ```ts
+   *  {
+   *    using _ = perfy.measure('block', (r) => console.log(r.time));
+   *    // ...work...
+   *  } // ended here
+   *  ```
+   *
+   *  @param name - Unique name for the instance.
+   *  @param onEnd - Optional callback invoked with the result on disposal.
+   *  @throws {PerfyError} `NAME_REQUIRED` when `name` is empty.
+   */
+  measure(name: string, onEnd?: (result: IPerfyResult) => void): IPerfyMeasurement {
+    const key = this.#requireName(name);
+    this.start(key, false);
+    let disposed = false;
+    return {
+      name: key,
+      [Symbol.dispose]: () => {
+        if (disposed) {
+          return;
+        }
+        disposed = true;
+        const result = this.end(key);
+        onEnd?.(result);
+      }
+    };
   }
 
   #requireName(name: string): string {

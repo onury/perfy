@@ -80,6 +80,7 @@ import {
 
 import type {
   IPerfyResult,       // the elapsed-time result object
+  IPerfyMeasurement,  // the disposable handle returned by measure()
   NanoClock,          // () => bigint monotonic nanosecond clock
   PerfyErrorCode,     // 'NAME_REQUIRED' | 'NO_INSTANCE' | 'NOT_STARTED' | 'INVALID_CALLBACK' | 'NO_CLOCK'
   DoneFn,             // the `done` callback passed to a callback-style exec task
@@ -98,6 +99,8 @@ Every method that takes a `name` throws a [`PerfyError`](#errors) with code `NAM
 | ------ | ------- | ----------- |
 | `start(name, autoDestroy?)` | `Perfy` | Creates a new instance under `name` and marks its start time. Reusing a name overwrites it. `autoDestroy` (default `true`) drops the instance when `end()` is called. Chainable. |
 | `end(name)` | [`IPerfyResult`](#the-result-object) | Ends the instance and returns the elapsed-time result. If `autoDestroy` was left on, the instance is removed right after. Calling `end()` again on a kept instance returns the same cached result. Throws `NO_INSTANCE` if no such instance exists. |
+| `lap(name)` | [`IPerfyResult`](#the-result-object) | Records a **split** — the elapsed time since the previous lap (or since `start` for the first) — then advances the lap marker. The instance keeps running; `end()` still reports the total from `start`. Throws `NO_INSTANCE` if no such instance exists. |
+| `measure(name, onEnd?)` | [`IPerfyMeasurement`](#the-result-object) | Starts a kept instance and returns a **disposable** whose `[Symbol.dispose]` ends it — so a `using` declaration times its enclosing scope. The result stays retrievable via `result(name)`; pass `onEnd` to receive it immediately. Disposing twice is a no-op. |
 | `exec([name,] fn)` | [`IPerfyResult`](#the-result-object) \| `Promise<IPerfyResult>` \| `Perfy` | Times the execution of `fn`, picking the mode from the task itself. **Synchronous** (`fn` returns a non-thenable) → ended automatically, result returned. **Promise-returning** (`fn` returns a promise) → awaited, resolves to the result (a rejection is propagated). **Callback-style** (`fn(done)` declares a `done` argument) → must call `done()` to end; returns the `Perfy` instance immediately. Pass a `name` to keep the instance. Throws `INVALID_CALLBACK` if `fn` is not a function. |
 | `result(name)` | [`IPerfyResult`](#the-result-object) \| `null` | The stored result of a kept, ended instance — or `null` if it does not exist or has not ended yet. |
 | `exists(name)` | `boolean` | Whether an instance currently exists under `name`. `false` once an auto-destroyed instance has ended. |
@@ -177,6 +180,26 @@ perfy.exec((done) => {
     console.log(result.time);
   }, 1000);
 });
+```
+
+**Laps** — record splits within one running timer:
+
+```ts
+perfy.start('pipeline');
+loadData();
+console.log('load:', perfy.lap('pipeline').time);
+transform();
+console.log('transform:', perfy.lap('pipeline').time);
+console.log('total:', perfy.end('pipeline').time);
+```
+
+**Scope timing with `using`** — the timer ends automatically when the block exits:
+
+```ts
+{
+  using _ = perfy.measure('block', (r) => console.log(r.time));
+  // ...work...
+} // ended here
 ```
 
 **Named `exec()`** keeps the instance for later retrieval:

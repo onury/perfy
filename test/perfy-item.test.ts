@@ -57,4 +57,34 @@ describe('PerfyItem', () => {
     item.start();
     expect(item.result).toBeNull();
   });
+
+  it('throws PerfyError(NOT_STARTED) when lapped before started', () => {
+    const item = new PerfyItem('x', clockOf(0n));
+    try {
+      item.lap();
+      expect.unreachable();
+    } catch (err) {
+      expect((err as PerfyError).code).toBe('NOT_STARTED');
+    }
+  });
+
+  it('laps return splits from the previous marker with correct wall stamps', () => {
+    vi.spyOn(Date, 'now')
+      .mockReturnValueOnce(1000) // start
+      .mockReturnValueOnce(1500) // lap 1
+      .mockReturnValueOnce(1800); // lap 2
+    const item = new PerfyItem('m', clockOf(0n, 400_000_000n, 900_000_000n), false);
+    item.start();
+
+    expect(item.lap()).toMatchObject({ startTime: 1000, endTime: 1500, milliseconds: 400 });
+    expect(item.lap()).toMatchObject({ startTime: 1500, endTime: 1800, milliseconds: 500 });
+  });
+
+  it('does not overwrite the stored end() result when lapping', () => {
+    const item = new PerfyItem('m', clockOf(0n, 3_000_000_000n, 4_000_000_000n), false);
+    item.start();
+    const total = item.end();
+    item.lap();
+    expect(item.result).toBe(total);
+  });
 });

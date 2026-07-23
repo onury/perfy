@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here. The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## 2.1.0 (2026-07-23)
+
+### Added
+
+- **`lap(name)`** — record a split (elapsed since the previous lap, or since `start` for the first) and advance the lap marker, while the instance keeps running toward its `end()` total. Handy for timing the stages of a pipeline or the iterations of a loop.
+- **`measure(name, onEnd?)`** — start a kept instance and get back a disposable handle, so a `using` declaration times its enclosing scope and ends the timer automatically on exit. The result stays retrievable via `result(name)`, or is delivered immediately to the optional `onEnd` callback. Exports the `IPerfyMeasurement` type.
+
 ## 2.0.0 (2026-07-23)
 
 A ground-up modernization. Perfy is now written in **TypeScript**, ships as **ESM**, and runs **everywhere** — Node.js, browsers, Deno and Bun. This is a **breaking** release; see the migration notes below.
