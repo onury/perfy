@@ -1,222 +1,228 @@
 # perfy
 
-[![npm](http://img.shields.io/npm/v/perfy.svg)](https://www.npmjs.com/package/perfy)
-[![release](https://img.shields.io/github/release/onury/perfy.svg)](https://github.com/onury/perfy)
-[![downloads](http://img.shields.io/npm/dm/perfy.svg)](https://www.npmjs.com/package/perfy)
-[![license](http://img.shields.io/npm/l/perfy.svg)](https://github.com/onury/perfy/blob/master/LICENSE)
+<p align="center">
+  <a href="https://github.com/onury/perfy/actions/workflows/ci.yml"><img src="https://github.com/onury/perfy/actions/workflows/ci.yml/badge.svg" alt="build" /></a>
+  <a href="#tests--quality"><img src="https://img.shields.io/badge/coverage-100%25-2BB150?logo=vitest&logoColor=%23FDC72B&style=flat" alt="coverage" /></a>
+  <a href="https://stryker-mutator.io/docs/"><img src="https://img.shields.io/badge/mutation-100%25-2BB150?style=flat" alt="mutation score" /></a>
+  <a href="https://www.npmjs.com/package/perfy"><img src="https://img.shields.io/npm/v/perfy.svg?style=flat&label=&color=%23C6234B&logo=npm" alt="version" /></a>
+  <a href="https://www.npmjs.com/package/perfy"><img src="https://img.shields.io/npm/dm/perfy.svg?style=flat&color=2BB150&label=downloads" alt="downloads" /></a>
+  <a href="#"><img src="https://img.shields.io/badge/dependencies-0-2BB150?style=flat" alt="zero dependencies" /></a>
+  <a href="https://gist.github.com/onury/d3f3d765d7db2e8b2d050d14315f2ac7"><img src="https://img.shields.io/badge/ESM-F7DF1E?style=flat" alt="ESM" /></a>
+  <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TS-3260C7?style=flat" alt="TS" /></a>
+  <a href="https://github.com/onury/perfy/blob/master/LICENSE"><img src="https://img.shields.io/npm/l/perfy.svg?style=flat&color=blue" alt="license" /></a>
+</p>
 
-A simple, light-weight Node.js utility for measuring code execution performance in high-resolution real times.
+> This module is **ESM** 🔆. Please [**read this**](https://gist.github.com/onury/d3f3d765d7db2e8b2d050d14315f2ac7).
 
-> © 2021, Onur Yıldırım ([@onury][onury]). MIT License.
+A tiny, **zero-dependency** utility for measuring code execution time in **high-resolution real time** — named timers, one-shot `exec()` wrappers, and a rich elapsed-time result. Runs in **Node.js, browsers, Deno and Bun**.
+
+```ts
+import { perfy } from 'perfy';
+
+perfy.start('loop');
+// ...heavy work...
+console.log(perfy.end('loop').time); // -> 1.235 (sec.)
+```
+
+> [!NOTE]
+> Perfy picks the **most precise clock available**: `process.hrtime.bigint()` on Node.js (exact integer nanoseconds), falling back to `performance.now()` elsewhere. The elapsed time is computed with integer-nanosecond math, so it never accumulates floating-point drift. Wall-clock `startTime` / `endTime` stamps come from `Date.now()`.
 
 ## Installation
 
 ```sh
-    npm install perfy --save
+npm install perfy
 ```
 
 ## Usage
 
-```js
-var perfy = require('perfy');
-```
+Call `perfy.start('name')` to create a timer and mark its start, then `perfy.end('name')` to get the elapsed-time [result](#the-result-object). By default the instance is destroyed once ended.
 
-Simple. Just call `perfy.start('name')` and the performance instance will be created and start time will be set until you call `perfy.end('name')` which returns a result object containing the high-res elapsed time information (and destroys the created instance).
+```ts
+import { perfy } from 'perfy';
 
-```js
 perfy.start('loop-stuff');
-// some heavy stuff here...
-var result = perfy.end('loop-stuff');
-console.log(result.time); // —> 1.459 (sec.)
+// ...some heavy stuff here...
+const result = perfy.end('loop-stuff');
+console.log(result.time); // -> 1.459 (sec.)
 ```
-... or you could:
-```js
-perfy.exec('async-stuff', function (done) {
-    // some heavy stuff here...
-    var result = done();
-    console.log(result.time); // —> 1.459 (sec.)
+
+...or wrap the work in `exec()` and let Perfy time it for you:
+
+```ts
+perfy.exec('async-stuff', (done) => {
+  // ...some heavy async stuff here...
+  const result = done();
+  console.log(result.time); // -> 1.459 (sec.)
 });
 ```
 
-## Documentation
+The exported `perfy` is a shared singleton — the simplest way to use the library. When you want an **isolated registry** (or a custom clock, e.g. in tests), construct your own:
 
-### `.start(name [, autoDestroy])`
-Initializes a new performance instance with the given name; and marks the current high-resolution real time.
+```ts
+import { Perfy } from 'perfy';
 
-**Parameters:**
+const perfy = new Perfy();
+```
 
- - *name* `String` — Required. Unique name of the performance instance to be started. Setting an existing name will overwrite this item. Use `.exists()` method to check for existence.
- - *autoDestroy* `Boolean` — Optional. Default: `true`. Specifies whether this performance instance should be destroyed when `.end()` is called.
+## Exports
 
-**returns** `perfy`
+Everything is a **named** export (there is no default export):
 
-### `.end(name)`
-Ends the performance instance with the given name; and calculates the elapsed high-resolution real time. Note that if `autoDestroy` is not disabled when `.start()` is called; corresponding performance instance is immediately destroyed after returning the result.
+```ts
+import {
+  perfy,              // shared Perfy singleton — the simplest entry point
+  Perfy,              // class — construct an isolated registry: new Perfy(clock?)
+  PerfyItem,          // a single timing instance (advanced / typing)
+  PerfyError,         // Error subclass thrown on failure, with a `.code`
+  createNanoClock,    // build a NanoClock from given host objects
+  defaultNanoClock    // the NanoClock selected for this environment
+} from 'perfy';
 
-**Parameters:**
+import type {
+  IPerfyResult,       // the elapsed-time result object
+  NanoClock,          // () => bigint monotonic nanosecond clock
+  PerfyErrorCode,     // 'NAME_REQUIRED' | 'NO_INSTANCE' | 'NOT_STARTED' | 'INVALID_CALLBACK' | 'NO_CLOCK'
+  DoneFn,             // the `done` callback passed to a callback-style exec task
+  SyncTask,
+  AsyncTask,
+  PromiseTask,
+  PerfyTask           // SyncTask | AsyncTask | PromiseTask
+} from 'perfy';
+```
 
- - *name* `String` — Required. Unique name of the performance instance to be ended.
+## API
 
-**returns** `Object` — A result object with the following properties.
+Every method that takes a `name` throws a [`PerfyError`](#errors) with code `NAME_REQUIRED` when it is empty.
 
- - *name* `String` — Initialized name of the performance instance.
- - *seconds* `Number` — Seconds portion of the elapsed time. e.g. `1`
- - *milliseconds* `Number` — Nanoseconds portion converted to milliseconds. `235.125283`
- - *nanoseconds* `Number` — Nanoseconds portion of the elapsed time. e.g. `235125283`
- - *time* `Number` — Float representation of full elapsed time in seconds. e.g. `1.235`
- - *fullSeconds* `Number` — Alias of `.time`.
- - *fullMilliseconds* `Number` — Float representation of full elapsed time in milliseconds. e.g. `1235.125`
- - *fullNanoseconds* `Number` — Float representation of full elapsed time in nanoseconds. e.g. `1235125283`
- - *summary* `String` — Text summary shorthand for elapsed time.
- - *startTime* `Number` — UTC start time of the execution (low-resolution). e.g. `1533302465251`
- - *endTime* `Number` — UTC end time of the execution (low-resolution). e.g. `1533302466486`
+| Method | Returns | Description |
+| ------ | ------- | ----------- |
+| `start(name, autoDestroy?)` | `Perfy` | Creates a new instance under `name` and marks its start time. Reusing a name overwrites it. `autoDestroy` (default `true`) drops the instance when `end()` is called. Chainable. |
+| `end(name)` | [`IPerfyResult`](#the-result-object) | Ends the instance and returns the elapsed-time result. If `autoDestroy` was left on, the instance is removed right after. Calling `end()` again on a kept instance returns the same cached result. Throws `NO_INSTANCE` if no such instance exists. |
+| `exec([name,] fn)` | [`IPerfyResult`](#the-result-object) \| `Promise<IPerfyResult>` \| `Perfy` | Times the execution of `fn`, picking the mode from the task itself. **Synchronous** (`fn` returns a non-thenable) → ended automatically, result returned. **Promise-returning** (`fn` returns a promise) → awaited, resolves to the result (a rejection is propagated). **Callback-style** (`fn(done)` declares a `done` argument) → must call `done()` to end; returns the `Perfy` instance immediately. Pass a `name` to keep the instance. Throws `INVALID_CALLBACK` if `fn` is not a function. |
+| `result(name)` | [`IPerfyResult`](#the-result-object) \| `null` | The stored result of a kept, ended instance — or `null` if it does not exist or has not ended yet. |
+| `exists(name)` | `boolean` | Whether an instance currently exists under `name`. `false` once an auto-destroyed instance has ended. |
+| `names()` | `string[]` | Names of all existing instances. |
+| `count()` | `number` | Number of existing instances. |
+| `destroy(name)` | `Perfy` | Destroys the instance under `name`, if any. Chainable. |
+| `destroyAll()` | `Perfy` | Destroys all existing instances. Chainable. |
 
-### `.exec([name,] fn)`
-Initializes a new performance instance right before executing the given function, and automatically ends after the execution is done.
+### The Result Object
 
-**Parameters:**
+`end()` (and `exec()` / `result()`) return an `IPerfyResult` — every field is a plain `number`/`string`, so the object is safe to `JSON.stringify`.
 
- - *name* `String` — Optional. Unique name of the performance instance. Set this if you want the keep the instance for later use (such as getting the result at a later time).
- - *fn* `Function` — Required. Function to be executed. This function is invoked with an optional `done` argument which is only required if you are running an asynchronous operation. You should omit the `done` argument if it's a synchronous operation.
+| Property | Type | Description |
+| -------- | ---- | ----------- |
+| `name` | `string` | Name of the instance (`''` for an unnamed `exec()`). |
+| `time` | `number` | Full elapsed time in **seconds** (float, 3 decimals). e.g. `1.235` |
+| `milliseconds` | `number` | Full elapsed time in **milliseconds** (float). e.g. `1235.125` |
+| `nanoseconds` | `number` | Full elapsed time in **nanoseconds**. e.g. `1235125283` |
+| `summary` | `string` | Human-readable shorthand. e.g. `'loop: 1.235 sec.'` |
+| `startTime` | `number` | UTC wall-clock time (ms) at start, via `Date.now()`. e.g. `1533302465251` |
+| `endTime` | `number` | UTC wall-clock time (ms) at end, via `Date.now()`. e.g. `1533302466486` |
 
-**returns** `Object|perfy` — Returns a result object if running a **synchronous** operation (by omitting `done`).
-```js
-function syncOp() {
-    // sync operation
+## Examples
+
+**Reading the elapsed time in different units:**
+
+```ts
+perfy.start('metric');
+// ...
+const r = perfy.end('metric');
+console.log(`${r.time} sec.`);          // -> 1.234 sec.
+console.log(`${r.milliseconds} ms.`);   // -> 1234.567 ms.
+console.log(r.summary);                 // -> metric: 1.234 sec.
+```
+
+**Auto-destroy (default):**
+
+```ts
+perfy.start('metric').count();  // -> 1
+perfy.end('metric');
+perfy.count();                  // -> 0 (destroyed on end)
+```
+
+**Keep the instance (disable `autoDestroy`):**
+
+```ts
+perfy.start('metric', false);
+perfy.end('metric').time;   // -> 0.123
+perfy.exists('metric');     // -> true (kept)
+perfy.result('metric');     // -> the same result object
+```
+
+**Timing a synchronous function** — `exec()` returns the result directly:
+
+```ts
+const result = perfy.exec(() => {
+  // sync work
+});
+console.log(result.time);
+```
+
+**Timing a promise / `async` function** — `exec` awaits it and resolves to the result:
+
+```ts
+const result = await perfy.exec('fetch', async () => {
+  await fetch('https://example.com');
+});
+console.log(result.time);
+```
+
+**Timing a callback-style async function** — call `done()` when finished:
+
+```ts
+perfy.exec((done) => {
+  setTimeout(() => {
+    const result = done();
+    console.log(result.time);
+  }, 1000);
+});
+```
+
+**Named `exec()`** keeps the instance for later retrieval:
+
+```ts
+perfy.exec('async-op', (done) => {
+  done();
+});
+perfy.exists('async-op');  // -> true
+perfy.result('async-op');  // -> the result object
+```
+
+**Destroy everything:**
+
+```ts
+perfy.destroyAll().count(); // -> 0
+```
+
+### Errors
+
+Every failure throws a `PerfyError` — an `Error` subclass carrying a stable, machine-readable `code` (`NAME_REQUIRED`, `NO_INSTANCE`, `NOT_STARTED`, `INVALID_CALLBACK`, `NO_CLOCK`):
+
+```ts
+import { perfy, PerfyError } from 'perfy';
+
+try {
+  perfy.end('never-started');
+} catch (err) {
+  if (err instanceof PerfyError && err.code === 'NO_INSTANCE') {
+    // handle it
+  }
 }
-var result = perfy.exec(syncOp);
-```
-Otherwise (if **asynchronous**), immediately returns the `perfy` object and result will be returned by calling `done()` from within `fn`.
-```js
-perfy.exec(function (done) {
-    // a-sync operation
-    var result = done();
-    // perfy.count() === 0 // (auto-destroyed)
-});
-```
-You can also save this performance instance by setting the name.
-```js
-perfy.exec('async-op', function (done) {
-    // a-sync operation
-    done();
-    perfy.exists('async-op'); // —> true (saved)
-});
 ```
 
-### `.result(name)`
-Gets the calculated result of the performance instance for the given name. To be used with non-destroyed, ended instances. If instance is not yet ended or does not exist at all, returns `null`.
+## Tests & Quality
 
-**Parameters:**
-
- - *name* `String` — Required. Unique name of the performance instance.
-
-**returns** `Object` — A result object (see `.end()` method).
-
-### `.exists(name)`
-Specifies whether a performance instance exists with the given name. This method will return `false` for an item, if called after `.end(name)` is called since the instance is destroyed.
-
-**Parameters:**
-
- - *name* `String` — Required. Name of the performance instance to be checked.
-
-**returns** `Boolean`
-
-### `.destroy(name)`
-Destroys the performance instance with the given name.
-
-**Parameters:**
-
- - *name* `String` — Required. Name of the performance instance to be destroyed.
-
-**returns** `perfy`
-
-### `.destroyAll()`
-Destroys all existing performance instances.
-
-**returns** `perfy`
-
-### `.names()`
-Gets the names of existing performance instances.
-
-**returns** `Array`
-
-### `.count()`
-Gets the total number of existing performance instances.
-
-**returns** `Number`
-
-## More Examples:
-
-Basic:
-```js
-perfy.start('metric-1');
-var result1 = perfy.end('metric-1');
-console.log(result1.seconds + ' sec, ' + result1.milliseconds.toFixed(3) + ' ms.');
-// —> 1 sec, 234 ms.
-// OR
-console.log(result1.time + ' sec. ');
-// —> 1.234 sec.
-```
-
-Auto-Destroy:
-```js
-perfy.start('metric-2').count(); // —> 1 (metric-1 is already destroyed)
-var result2 = perfy.end('metric-2');
-perfy.count(); // —> 0 (metric-2 is also destroyed after .end() is called)
-```
-
-Keep the instance (disable `autoDestroy`):
-```js
-perfy.start('metric-3', false);
-perfy.end('metric-3').time; // —> 0.123
-perfy.exists('metric-3'); // —> true
-```
-
-Destroy all:
-```js
-perfy.destroyAll().count(); // —> 0
-```
-
-Save/exec async:
-```js
-perfy
-    .exec('async-op', function (done) {
-        var result = done(); // === perfy.result('async-op')
-        perfy.count(); // 1
-    })
-    .count(); // 0 (sync)
-```
+100% test coverage (statements, branches, functions, lines) and a **100% [Stryker](https://stryker-mutator.io) mutation score**, run across Node.js 22 & 24 in CI.
 
 ## Changelog
 
-- **v1.1.5** (2018-08-03)
-    + Added `.fullMilliseconds` to result object. (PR [#2](https://github.com/onury/perfy/pull/2) by [@anho](https://github.com/anho))
-    + Added `.fullNanoseconds` and `.fullSeconds` (alias of `.time`) to result object.
-    + (Dev) Removed grunt in favour of npm scripts.
+See [**CHANGELOG.md**](CHANGELOG.md). **v2 is a breaking release** (ESM-only, universal clock, streamlined result object) — the migration notes live there.
 
-    ---
+## Related
 
-- **v1.1.2** (2016-03-23)
-    + Fixed `time` and `summary` padding issue. (PR [#1](https://github.com/onury/perfy/pull/1) by [@gunnarlium](https://github.com/gunnarlium))
-    + Other minor dev improvements.
+- [**tasktimer**](https://github.com/onury/tasktimer) — An accurate timer utility for running periodic tasks on the given interval ticks or dates.
 
-    ---
+## License
 
-- **v1.1.0** (2015-10-16)
-    + Added `.exec()` convenience method.
-    + `.exists()` will throw if no `name` is specified.
-
-    ---
-
-- **v1.0.1** (2015-10-12)
-    + `.result(name)` will not throw (and return `null`) even if the perf-instance does not exist. It will throw if no name is specified.
-
-    ---
-
-- **v1.0.0** (2015-10-12)
-    + First release.
-
-    ---
-
-
-[onury]:https://github.com/onury
+© 2026, Onur Yıldırım. [**MIT**](LICENSE) License.

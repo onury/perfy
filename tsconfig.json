@@ -1,0 +1,22 @@
+{
+  "extends": "tsconfig-oy",
+  "compilerOptions": {
+    "ignoreDeprecations": "6.0",
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "incremental": false,
+    "outDir": "lib",
+    "declarationDir": "lib",
+    "declarationMap": true,
+    "rootDir": ".",
+    // No `typeRoots`: restricting it (e.g. to ["node_modules/@types"]) breaks
+    // resolution of package-subpath type entries like "vitest/globals", which
+    // does not live under @types. That surfaces as TS2688 here and TS2593
+    // ("Cannot find name 'describe'") across the test files.
+    "types": ["node", "vitest/globals"]
+  },
+  "include": [
+    "src/**/*.ts",
+    "test/**/*.ts"
+  ]
+}
